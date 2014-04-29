@@ -9,12 +9,13 @@ public class Launcher {
 
   private final long INTVL_PRO = 3;
   private final long INTVL_CON = 40;
-  private final int PER_TIME = Integer.MAX_VALUE>>14;
+  private final int PER_TIME = (Integer.MAX_VALUE>>14) * 7 / 6;
   
   private Thread producer = new Thread(new JobProd(), "tprod");
   private Thread consumer = new Thread(new JobCons(), "tcon");
   
-  private Memory mem = new Memory();
+//  private Memory mem = new Memory();
+  private PingPongMem mem = new PingPongMem();
   
   private boolean goOn = true;
 
@@ -71,18 +72,20 @@ public class Launcher {
   private class JobCons implements Runnable {
     @Override
     public void run() {
+      int end = -1;
       while (goOn) {
         try {
           Thread.sleep(INTVL_CON);
           int[] temp = mem.read();
-          System.out.println("start:" + temp[0]);
+          if (temp[0] - end != 1) System.out.println("error a " + end + ", " + temp[0]);
           int pre = temp[0];
           for (int i = 1; i < temp.length; pre = temp[i],++i){
             if (temp[i] - pre != 1) {
-              System.out.println("error! " + pre + ", " + temp[i]);
+              System.out.println("error b " + pre + ", " + temp[i]);
             }
           }
-          System.out.println("end: " + temp[temp.length - 1]);
+          end = temp[temp.length - 1];
+//          System.out.println("end: " + temp[temp.length - 1]);
         } catch (InterruptedException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();

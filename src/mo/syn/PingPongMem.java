@@ -7,6 +7,7 @@ public class PingPongMem {
   
   public void write(int[] din) {
     if (cur.isLocked()) {
+//    if (true) {
       if (cur == ma) cur = mb;
       else cur = ma;
     }
